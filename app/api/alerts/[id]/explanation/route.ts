@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getShopIdFromSession } from "@/lib/auth/session";
-import { getAdminClient } from "@/lib/supabase/admin";
+import { getAdminClient, type RefundAlertRow } from "@/lib/supabase/admin";
 import { ExplanationGenerator } from "@/lib/detection/explanation/generator";
 import { type Finding, AlertReason } from "@/lib/detection/types";
 import { type NormalizedOrderData } from "@/lib/detection/normalize";
@@ -181,7 +181,7 @@ function determineTriggeredBy(
 
 // Helper function to construct evidence object
 function constructEvidence(
-  alert: any, // AlertRow from DB
+  alert: RefundAlertRow,
   data: NormalizedOrderData
 ): ExplanationEvidence {
   // Find the specific refund related to this alert
