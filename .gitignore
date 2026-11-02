@@ -1,0 +1,86 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+
+# testing
+/coverage
+
+# environment — never commit real secrets
+.env
+.env.local
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# logs
+*.log
+npm-debug.log*
+
+# os
+.DS_Store
+Thumbs.db
+
+# editor
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+
+# Local environment and secrets
+.env.*
+!.env.example
+
+# Local databases and transient database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Claude Flow generated runtime state
+.claude-flow/logs/
+.claude-flow/daemon-state.json
+.claude-flow/daemon.pid
+.claude-flow/metrics/
+.claude-flow/policy/state.json
+.claude-flow/security/audit-status.json
+
+# Swarm local state and backups
+.swarm/memory.db
+.swarm/memory.db-shm
+.swarm/memory.db-wal
+.swarm/backups/
+
+# Local Claude settings
+.claude/settings.local.json
+
+# Test output and temporary backups
+test_output.txt
+*.backup
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Local database artifacts
+ruvector.db
+
+# Local test evidence
+proof.txt
+test_output.txt
+
+# Keep generated Claude tooling state out of Git
+.claude-flow/
+.swarm/

@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* ReturnPilot design tokens — Tailwind v4 theme layer.
+   Keep this small; the product is a focused dashboard, not a design system. */
+@theme {
+  --color-brand-50: #eef6ff;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+
+  --color-risk-bg: #fef2f2;
+  --color-risk-fg: #b91c1c;
+  --color-ok-bg: #f0fdf4;
+  --color-ok-fg: #15803d;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
