@@ -1,13 +1,21 @@
 // app/api/email/digest/route.ts
 import { NextResponse, type NextRequest } from "next/server";
 import { processEmailDigest } from "@/lib/email/service";
+import { getEnv } from "@/lib/env";
+import { safeEqual } from "@/lib/crypto";
 
 // Node runtime REQUIRED for node:crypto (session signing).
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60; // digest can process several shops
 
 /**
- * POST /api/email/digest — send daily digest emails.
+ * GET /api/email/digest — Vercel Cron entry point for daily digest emails.
+ *
+ * Auth: a constant-time-checked `Authorization: Bearer <CRON_SECRET>`.
+ * Vercel Cron sends this header; without it we reject.
+ *
+ * POST /api/email/digest — send daily digest emails (retained for backwards compat).
  *
  * Fail-closed authentication:
  * 1. Reject non-POST requests (405)
@@ -18,6 +26,24 @@ export const dynamic = "force-dynamic";
  * - Capture runStartedAt
  * - Call service layer to process email digest
  */
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  const { CRON_SECRET } = getEnv();
+
+  const auth = req.headers.get("authorization") ?? "";
+  const expected = `Bearer ${CRON_SECRET}`;
+  if (!safeEqual(auth, expected)) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  try {
+    await processEmailDigest();
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Email digest processing failed:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
   // 1. Reject every non-POST request
   if (req.method !== "POST") {

@@ -16,7 +16,7 @@ const serverSchema = z.object({
   SHOPIFY_API_KEY: z.string().min(1),
   SHOPIFY_API_SECRET: z.string().min(1),
   SHOPIFY_SCOPES: z.string().min(1).default("read_orders,read_returns"),
-  SHOPIFY_API_VERSION: z.string().min(1).default("2025-07"),
+  SHOPIFY_API_VERSION: z.string().min(1).default("2026-10"),
   // Billing-specific API version (optional, defaults to main API version)
   SHOPIFY_BILLING_API_VERSION: z.string().min(1).optional(),
   // Webhook secret for billing webhooks (optional, defaults to main webhook secret)
