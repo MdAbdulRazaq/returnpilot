@@ -1,0 +1,41 @@
+name: ReturnPilot — Hourly Shopify Sync
+
+on:
+  schedule:
+    # Every hour at :00 UTC (= :30 past the hour IST, UTC+5:30).
+    # GitHub scheduled runs may be delayed; they do not fire at the exact
+    # minute. The route is safe to run late (processes all active shops).
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: returnpilot-hourly-sync
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  sync:
+    name: hourly-shopify-sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Run hourly Shopify sync
+        timeout-minutes: 25
+        run: |
+          STATUS_CODE=$(curl -s -f -o /dev/null -w "%{http_code}" \
+            --max-time 120 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.RETURNPILOT_API_URL }}/api/sync")
+          echo "sync HTTP status: $STATUS_CODE"
+          if [ "$STATUS_CODE" != "200" ]; then
+            echo "::error::Hourly Shopify sync failed with HTTP $STATUS_CODE" >&2
+            exit 1
+          fi
+          echo "✅ Hourly Shopify sync completed"
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "::error::ReturnPilot hourly sync (run ${{ github.run_id }}) did not complete successfully."
+          echo "Review: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        shell: bash

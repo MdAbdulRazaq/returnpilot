@@ -1,0 +1,42 @@
+name: ReturnPilot — Daily Email Digest
+
+on:
+  schedule:
+    # 00:00 UTC daily (= 05:30 IST daily, UTC+5:30).
+    # GitHub scheduled runs may be delayed; they do not fire at the exact
+    # minute. The route is safe to run late (window advances via delivery
+    # records, so already-sent shops are not re-emailed).
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: returnpilot-daily-digest
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  digest:
+    name: daily-email-digest
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Run daily email digest
+        timeout-minutes: 25
+        run: |
+          STATUS_CODE=$(curl -s -f -o /dev/null -w "%{http_code}" \
+            --max-time 120 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.RETURNPILOT_API_URL }}/api/email/digest")
+          echo "digest HTTP status: $STATUS_CODE"
+          if [ "$STATUS_CODE" != "200" ]; then
+            echo "::error::Daily email digest failed with HTTP $STATUS_CODE" >&2
+            exit 1
+          fi
+          echo "✅ Daily email digest completed"
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "::error::ReturnPilot daily digest (run ${{ github.run_id }}) did not complete successfully."
+          echo "Review: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        shell: bash
